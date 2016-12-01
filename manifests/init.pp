@@ -126,6 +126,5 @@ class nomad (
     notify      => $notify_service,
   } ->
   class { 'nomad::run_service': } ->
-  class { 'nomad::reload_service': } ->
   anchor {'nomad_last': }
 }

@@ -225,20 +225,6 @@ describe 'nomad' do
     it { should_not contain_service('nomad') }
   end
 
-  context "When a reload_service is triggered with service_ensure stopped" do
-    let (:params) {{
-      :service_ensure => 'stopped',
-    }}
-    it { should_not contain_exec('reload nomad service')  }
-  end
-
-  context "When a reload_service is triggered with manage_service false" do
-    let (:params) {{
-      :manage_service => false,
-    }}
-    it { should_not contain_exec('reload nomad service')  }
-  end
-
   context "With a custom username" do
     let(:params) {{
       :user => 'custom_nomad_user',
@@ -261,45 +247,6 @@ describe 'nomad' do
       :group => 'custom_nomad_group',
       :mode  => '0600'
     )}
-  end
-
-  context "When nomad is reloaded" do
-    let (:facts) {{
-      :ipaddress_lo => '127.0.0.1'
-    }}
-    it {
-      should contain_exec('reload nomad service').
-        with_command('nomad reload -rpc-addr=127.0.0.1:8400')
-    }
-  end
-
-  context "When nomad is reloaded on a custom port" do
-    let (:params) {{
-      :config_hash => {
-        'ports' => {
-          'rpc' => '9999'
-        },
-        'addresses' => {
-          'rpc' => 'nomad.example.com'
-        }
-      }
-    }}
-    it {
-      should contain_exec('reload nomad service').
-        with_command('nomad reload -rpc-addr=nomad.example.com:9999')
-    }
-  end
-
-  context "When nomad is reloaded with a default client_addr" do
-    let (:params) {{
-      :config_hash => {
-        'client_addr' => '192.168.34.56',
-      }
-    }}
-    it {
-      should contain_exec('reload nomad service').
-        with_command('nomad reload -rpc-addr=192.168.34.56:8400')
-    }
   end
 
   context "When using sysv" do
