@@ -5,13 +5,33 @@
 #
 class nomad::params {
 
-  $install_method        = 'url'
-  $package_name          = 'nomad'
-  $package_ensure        = 'latest'
-  $download_url_base     = 'https://releases.hashicorp.com/nomad/'
-  $download_extension    = 'zip'
-  $version               = '0.2.3'
+  $archive_path          = '/opt/puppet-archive'
+  $bin_dir               = '/usr/local/bin'
+  $config_defaults       = {}
+  $config_dir            = '/etc/nomad'
+  $config_hash           = {}
   $config_mode           = '0660'
+  $download_extension    = 'zip'
+  $download_url          = undef
+  $download_url_base     = 'https://releases.hashicorp.com/nomad/'
+  $extra_groups          = []
+  $extra_options         = ''
+  $group                 = 'nomad'
+  $log_file              = '/var/log/nomad'
+  $install_method        = 'url'
+  $manage_group          = true
+  $manage_service        = true
+  $manage_user           = true
+  $package_ensure        = 'latest'
+  $package_name          = 'nomad'
+  $pretty_config         = false
+  $pretty_config_indent  = 4
+  $purge_config_dir      = true
+  $restart_on_change     = true
+  $service_enable        = true
+  $service_ensure        = 'running'
+  $user                  = 'nomad'
+  $version               = '0.5.0'
 
   case $::architecture {
     'x86_64', 'amd64': { $arch = 'amd64' }
