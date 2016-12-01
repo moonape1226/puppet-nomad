@@ -56,17 +56,6 @@ describe 'nomad' do
     it { should_not contain_class('nomad::config').that_notifies(['Class[nomad::run_service]']) }
   end
 
-  context 'When joining nomad to a wan cluster by a known URL' do
-    let(:params) {{
-        :join_wan => 'wan_host.test.com'
-    }}
-    it { should contain_exec('join nomad wan').with(:command => 'nomad join -wan wan_host.test.com') }
-  end
-
-  context 'By default, should not attempt to join a wan cluster' do
-    it { should_not contain_exec('join nomad wan') }
-  end
-
   context 'When requesting to install via a package with defaults' do
     let(:params) {{
       :install_method => 'package'

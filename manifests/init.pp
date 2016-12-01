@@ -51,7 +51,6 @@ class nomad (
   $extra_groups          = [],
   $purge_config_dir      = true,
   $group                 = 'nomad',
-  $join_wan              = false,
   $bin_dir               = '/usr/local/bin',
   $arch                  = $nomad::params::arch,
   $version               = $nomad::params::version,
