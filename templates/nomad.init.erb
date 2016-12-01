@@ -16,8 +16,7 @@
 NOMAD=<%= scope.lookupvar('nomad::bin_dir') %>/nomad
 CONFIG=<%= scope.lookupvar('nomad::config_dir') %>
 PID_FILE=/var/run/nomad/nomad.pid
-LOG_FILE=/var/log/nomad
-RPC_ADDR=-rpc-addr=<%= scope.lookupvar('nomad::rpc_addr') %>:<%= scope.lookupvar('nomad::rpc_port') %>
+LOG_FILE=<%= scope.lookupvar('nomad::log_file') %>
 
 [ -e /etc/sysconfig/nomad ] && . /etc/sysconfig/nomad
 
@@ -66,33 +65,6 @@ stop() {
         echo -n "Shutting down nomad: "
         mkpidfile
 
-        # If nomad is not acting as a server, exit gracefully
-        # Use SIGINT to create a "leave" event, unless the user has explicitly
-        # changed that behavior in the nomad config.
-        if ("${NOMAD}" info ${RPC_ADDR} 2>/dev/null | grep -q 'server = false' 2>/dev/null) ; then
-            nomad_pid=$(cat $PID_FILE)
-            killproc $KILLPROC_OPT $NOMAD -INT
-            retcode=$?
-
-            # We'll wait if necessary to make sure the leave works, and return
-            # early if we can.  If not, escalate to harsher signals.
-            try=0
-            while [ $try -lt $DELAY ]; do
-                if ! checkpid $nomad_pid ; then
-                    rm -f /var/lock/subsys/nomad
-                    return $retcode
-                fi
-                sleep 1
-                let try+=1
-            done
-        fi
-
-        # If acting as a server, use a SIGTERM to avoid a leave.
-        # This behavior is also configurable.  Avoid doing a "leave" because
-        # having servers missing is a bad thing that we want to notice.
-        #
-        # A SIGTERM will mark the node as "failed" until it rejoins.
-        # killproc with no arguments uses TERM, then escalates to KILL.
         killproc $KILLPROC_OPT $NOMAD
         retcode=$?
 
@@ -108,7 +80,7 @@ case "$1" in
         stop
         ;;
     status)
-        "$NOMAD" info ${RPC_ADDR}
+        status -p $PID_FILE
         ;;
     restart)
         stop

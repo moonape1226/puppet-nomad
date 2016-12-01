@@ -249,51 +249,14 @@ describe 'nomad' do
     )}
   end
 
-  context "When using sysv" do
+  context "When using init" do
     let (:params) {{
-      :init_style => 'sysv'
+      :init_style => 'init'
     }}
     let (:facts) {{
       :ipaddress_lo => '127.0.0.1'
     }}
-    it { should contain_class('nomad').with_init_style('sysv') }
-    it {
-      should contain_file('/etc/init.d/nomad').
-        with_content(/-rpc-addr=127.0.0.1:8400/)
-    }
-  end
-
-  context "When overriding default rpc port on sysv" do
-    let (:params) {{
-      :init_style => 'sysv',
-      :config_hash => {
-        'ports' => {
-          'rpc' => '9999'
-        },
-        'addresses' => {
-          'rpc' => 'nomad.example.com'
-        }
-      }
-    }}
-    it { should contain_class('nomad').with_init_style('sysv') }
-    it {
-      should contain_file('/etc/init.d/nomad').
-        with_content(/-rpc-addr=nomad.example.com:9999/)
-    }
-  end
-
-  context "When rpc_addr defaults to client_addr on sysv" do
-    let (:params) {{
-      :init_style => 'sysv',
-      :config_hash => {
-        'client_addr' => '192.168.34.56',
-      }
-    }}
-    it { should contain_class('nomad').with_init_style('sysv') }
-    it {
-      should contain_file('/etc/init.d/nomad').
-        with_content(/-rpc-addr=192.168.34.56:8400/)
-    }
+    it { should contain_class('nomad').with_init_style('init') }
   end
 
   context "When using debian" do
@@ -304,29 +267,6 @@ describe 'nomad' do
       :ipaddress_lo => '127.0.0.1'
     }}
     it { should contain_class('nomad').with_init_style('debian') }
-    it {
-      should contain_file('/etc/init.d/nomad').
-        with_content(/-rpc-addr=127.0.0.1:8400/)
-    }
-  end
-
-  context "When overriding default rpc port on debian" do
-    let (:params) {{
-      :init_style => 'debian',
-      :config_hash => {
-        'ports' => {
-          'rpc' => '9999'
-        },
-        'addresses' => {
-          'rpc' => 'nomad.example.com'
-        }
-      }
-    }}
-    it { should contain_class('nomad').with_init_style('debian') }
-    it {
-      should contain_file('/etc/init.d/nomad').
-        with_content(/-rpc-addr=nomad.example.com:9999/)
-    }
   end
 
   context "When using upstart" do
@@ -337,29 +277,6 @@ describe 'nomad' do
       :ipaddress_lo => '127.0.0.1'
     }}
     it { should contain_class('nomad').with_init_style('upstart') }
-    it {
-      should contain_file('/etc/init/nomad.conf').
-        with_content(/-rpc-addr=127.0.0.1:8400/)
-    }
-  end
-
-  context "When overriding default rpc port on upstart" do
-    let (:params) {{
-      :init_style => 'upstart',
-      :config_hash => {
-        'ports' => {
-          'rpc' => '9999'
-        },
-        'addresses' => {
-          'rpc' => 'nomad.example.com'
-        }
-      }
-    }}
-    it { should contain_class('nomad').with_init_style('upstart') }
-    it {
-      should contain_file('/etc/init/nomad.conf').
-        with_content(/-rpc-addr=nomad.example.com:9999/)
-    }
   end
 
   context "On a redhat 6 based OS" do
@@ -368,7 +285,7 @@ describe 'nomad' do
       :operatingsystemrelease => '6.5'
     }}
 
-    it { should contain_class('nomad').with_init_style('sysv') }
+    it { should contain_class('nomad').with_init_style('redhat') }
     it { should contain_file('/etc/init.d/nomad').with_content(/daemon --user=nomad/) }
   end
 
@@ -387,7 +304,7 @@ describe 'nomad' do
       :operatingsystemrelease => '3.10.34-37.137.amzn1.x86_64'
     }}
 
-    it { should contain_class('nomad').with_init_style('sysv') }
+    it { should contain_class('nomad').with_init_style('redhat') }
     it { should contain_file('/etc/init.d/nomad').with_content(/daemon --user=nomad/) }
   end
 
@@ -437,8 +354,8 @@ describe 'nomad' do
   end
 
   context "When asked not to manage the init_style" do
-    let(:params) {{ :init_style => false }}
-    it { should contain_class('nomad').with_init_style(false) }
+    let(:params) {{ :init_style => 'unmanaged' }}
+    it { should contain_class('nomad').with_init_style('unmanaged') }
     it { should_not contain_file("/etc/init.d/nomad") }
     it { should_not contain_file("/lib/systemd/system/nomad.service") }
   end

@@ -15,9 +15,9 @@ class nomad::config(
   $purge = true,
 ) {
 
-  if $nomad::init_style {
+  if $::nomad::init_style != 'unmanaged' {
 
-    case $nomad::init_style {
+    case $::nomad::init_style {
       'upstart' : {
         file { '/etc/init/nomad.conf':
           mode    => '0444',
@@ -34,12 +34,6 @@ class nomad::config(
         }
       }
       'systemd' : {
-        file { '/etc/sysconfig/nomad':
-          ensure => directory,
-          mode   => '0644',
-          owner  => 'root',
-          group  => 'root',
-        }->
         file { '/lib/systemd/system/nomad.service':
           mode    => '0644',
           owner   => 'root',
@@ -52,12 +46,12 @@ class nomad::config(
           refreshonly => true,
         }
       }
-      'sysv' : {
+      'init','redhat' : {
         file { '/etc/init.d/nomad':
           mode    => '0555',
           owner   => 'root',
           group   => 'root',
-          content => template('nomad/nomad.sysv.erb')
+          content => template('nomad/nomad.init.erb')
         }
       }
       'debian' : {
@@ -84,26 +78,33 @@ class nomad::config(
           content => template('nomad/nomad.launchd.erb')
         }
       }
+      'freebsd': {
+        file { '/etc/rc.conf.d/nomad':
+          mode    => '0444',
+          owner   => 'root',
+          group   => 'wheel',
+          content => template('nomad/nomad.freebsd.erb')
+        }
+      }
       default : {
-        fail("I don't know how to create an init script for style ${nomad::init_style}")
+        fail("I don't know how to create an init script for style ${::nomad::init_style}")
       }
     }
   }
 
-  file { $nomad::config_dir:
-    ensure  => 'directory',
-    owner   => $nomad::user,
-    group   => $nomad::group,
+  file { $::nomad::config_dir:
+    ensure  => directory,
+    owner   => $::nomad::user,
+    group   => $::nomad::group,
     purge   => $purge,
     recurse => $purge,
   } ->
   file { 'nomad config.json':
-    ensure  => present,
-    path    => "${nomad::config_dir}/config.json",
-    owner   => $nomad::user,
-    group   => $nomad::group,
-    mode    => $nomad::config_mode,
-    content => nomad_sorted_json($config_hash, $nomad::pretty_config, $nomad::pretty_config_indent),
+    path    => "${::nomad::config_dir}/config.json",
+    owner   => $::nomad::user,
+    group   => $::nomad::group,
+    mode    => $::nomad::config_mode,
+    content => nomad_sorted_json($config_hash, $::nomad::pretty_config, $::nomad::pretty_config_indent),
   }
 
 }

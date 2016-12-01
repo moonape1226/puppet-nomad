@@ -1,0 +1,15 @@
+# Managed by Puppet
+<% if scope.lookupvar('nomad::service_enable') %>
+nomad_enable="YES"
+<% else %>
+nomad_enable="NO"
+<% end %>
+<% if scope.lookupvar('nomad::user') %>
+nomad_user="<%= scope.lookupvar('nomad::user') %>"
+<% end %>
+<% if scope.lookupvar('nomad::group') %>
+nomad_group="<%= scope.lookupvar('nomad::group') %>"
+<% end %>
+<% if scope.lookupvar('nomad::bin_dir') %>
+nomad_dir="<%= scope.lookupvar('nomad::bin_dir') %>"
+<% end %>

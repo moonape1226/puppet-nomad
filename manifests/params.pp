@@ -36,6 +36,7 @@ class nomad::params {
   case $::architecture {
     'x86_64', 'amd64': { $arch = 'amd64' }
     'i386':            { $arch = '386'   }
+    /^arm.*/:          { $arch = 'arm'   }
     default:           {
       fail("Unsupported kernel architecture: ${::architecture}")
     }
@@ -53,13 +54,13 @@ class nomad::params {
     }
   } elsif $::operatingsystem =~ /Scientific|CentOS|RedHat|OracleLinux/ {
     if versioncmp($::operatingsystemrelease, '7.0') < 0 {
-      $init_style = 'sysv'
+      $init_style = 'redhat'
     } else {
       $init_style  = 'systemd'
     }
   } elsif $::operatingsystem == 'Fedora' {
     if versioncmp($::operatingsystemrelease, '12') < 0 {
-      $init_style = 'sysv'
+      $init_style = 'init'
     } else {
       $init_style = 'systemd'
     }
@@ -82,11 +83,10 @@ class nomad::params {
   } elsif $::operatingsystem == 'Darwin' {
     $init_style = 'launchd'
   } elsif $::operatingsystem == 'Amazon' {
-    $init_style = 'sysv'
+    $init_style = 'redhat'
+  } elsif $::operatingsystem == 'FreeBSD' {
+    $init_style = 'freebsd'
   } else {
-    $init_style = undef
-  }
-  if $init_style == undef {
-    fail('Unsupported OS')
+    fail('Cannot determine init_style, unsupported OS')
   }
 }
