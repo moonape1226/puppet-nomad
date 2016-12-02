@@ -10,12 +10,15 @@
 .rvmrc
 /.bundle/
 /.config
+/.vagrant/
 /.yardoc/
 /InstalledFiles
 /_yardoc/
 /coverage/
 /doc/
+/junit
 /lib/bundler/man/
+/log
 /pkg/
 /rdoc/
 /spec/examples.txt
