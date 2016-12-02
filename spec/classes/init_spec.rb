@@ -15,44 +15,79 @@ describe 'nomad' do
   end
 
   # Installation Stuff
-  context 'On an unsupported arch' do
-    let(:facts) {{ :architecture => 'bogus' }}
+  context 'On an unsupported architecture' do
+    let(:facts) {{ :architecture => '__ARCHITECTURE__' }}
     let(:params) {{
       :install_method => 'package'
     }}
     it { expect { should compile }.to raise_error(/Unsupported kernel architecture:/) }
   end
 
-  context 'When not specifying whether to purge config' do
-    it { should contain_file('/etc/nomad').with(:purge => true,:recurse => true) }
-  end
-
-  context 'When passing a non-bool as purge_config_dir' do
+  context 'When passing a non-bool as manage_group' do
     let(:params) {{
-      :purge_config_dir => 'hello'
+      :manage_group => '__STRING__'
     }}
     it { expect { should compile }.to raise_error(/is not a boolean/) }
   end
 
   context 'When passing a non-bool as manage_service' do
     let(:params) {{
-      :manage_service => 'hello'
+      :manage_service => '__STRING__'
     }}
     it { expect { should compile }.to raise_error(/is not a boolean/) }
   end
 
-  context 'When disable config purging' do
+  context 'When passing a non-bool as manage_user' do
+    let(:params) {{
+      :manage_user => '__STRING__'
+    }}
+    it { expect { should compile }.to raise_error(/is not a boolean/) }
+  end
+
+  context 'When passing a non-integer as pretty_config_indent' do
+    let(:params) {{
+      :pretty_config_indent => '__STRING__'
+    }}
+    it { expect { should compile }.to raise_error(/Expected first argument to be an Integer/) }
+  end
+
+  context 'When passing a non-bool as pretty_config' do
+    let(:params) {{
+      :pretty_config => '__STRING__'
+    }}
+    it { expect { should compile }.to raise_error(/is not a boolean/) }
+  end
+
+  context 'When not specifying purge_config_dir' do
+    it { should contain_file('/etc/nomad').with(:purge => true, :recurse => true) }
+  end
+
+  context 'When passing a non-bool as purge_config_dir' do
+    let(:params) {{
+      :purge_config_dir => '__STRING__'
+    }}
+    it { expect { should compile }.to raise_error(/is not a boolean/) }
+  end
+
+  context 'When purge_config_dir disabled' do
     let(:params) {{
       :purge_config_dir => false
     }}
     it { should contain_class('nomad::config').with(:purge => false) }
   end
 
-  context 'nomad::config should notify nomad::run_service' do
+  context 'When not specifying restart_on_change' do
     it { should contain_class('nomad::config').that_notifies(['Class[nomad::run_service]']) }
   end
 
-  context 'nomad::config should not notify nomad::run_service on config change' do
+  context 'When passing a non-bool as restart_on_change' do
+    let(:params) {{
+      :restart_on_change => '__STRING__'
+    }}
+    it { expect { should compile }.to raise_error(/is not a boolean/) }
+  end
+
+  context 'When restart_on_change disabled' do
     let(:params) {{
       :restart_on_change => false
     }}
@@ -63,22 +98,22 @@ describe 'nomad' do
     let(:params) {{
       :install_method => 'package'
     }}
-    it { should contain_package('nomad').with(:ensure => 'latest') }
+    it { should contain_package('nomad').with(:ensure => :latest) }
   end
 
   context 'When requesting to install via a custom package and version' do
     let(:params) {{
       :install_method => 'package',
-      :package_ensure => 'specific_release',
-      :package_name   => 'custom_nomad_package'
+      :package_ensure => '__PACKAGE_ENSURE__',
+      :package_name   => '__PACKAGE_NAME__'
     }}
-    it { should contain_package('custom_nomad_package').with(:ensure => 'specific_release') }
+    it { should contain_package('__PACKAGE_NAME__').with(:ensure => '__PACKAGE_ENSURE__') }
   end
 
   context "When installing via URL by default" do
     it { should contain_archive('/opt/puppet-archive/nomad-0.5.0.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.0/nomad_0.5.0_linux_amd64.zip') }
-    it { should contain_file('/opt/puppet-archive').with(:ensure => 'directory') }
-    it { should contain_file('/opt/puppet-archive/nomad-0.5.0').with(:ensure => 'directory') }
+    it { should contain_file('/opt/puppet-archive').with(:ensure => :directory) }
+    it { should contain_file('/opt/puppet-archive/nomad-0.5.0').with(:ensure => :directory) }
     it { should contain_file('/usr/local/bin/nomad').that_notifies('Class[nomad::run_service]') }
   end
 
@@ -87,8 +122,8 @@ describe 'nomad' do
       :archive_path   => '/usr/share/puppet-archive',
     }}
     it { should contain_archive('/usr/share/puppet-archive/nomad-0.5.0.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.0/nomad_0.5.0_linux_amd64.zip') }
-    it { should contain_file('/usr/share/puppet-archive').with(:ensure => 'directory') }
-    it { should contain_file('/usr/share/puppet-archive/nomad-0.5.0').with(:ensure => 'directory') }
+    it { should contain_file('/usr/share/puppet-archive').with(:ensure => :directory) }
+    it { should contain_file('/usr/share/puppet-archive/nomad-0.5.0').with(:ensure => :directory) }
     it { should contain_file('/usr/local/bin/nomad').that_notifies('Class[nomad::run_service]') }
   end
 
@@ -109,9 +144,9 @@ describe 'nomad' do
 
   context "When installing via URL by with a custom url" do
     let(:params) {{
-      :download_url   => 'http://myurl',
+      :download_url   => '__DOWNLOAD_URL__',
     }}
-    it { should contain_archive('/opt/puppet-archive/nomad-0.5.0.zip').with(:source => 'http://myurl') }
+    it { should contain_archive('/opt/puppet-archive/nomad-0.5.0.zip').with(:source => '__DOWNLOAD_URL__') }
     it { should contain_file('/usr/local/bin/nomad').that_notifies('Class[nomad::run_service]') }
   end
 
@@ -119,7 +154,7 @@ describe 'nomad' do
     let(:params) {{
       :install_method => 'package'
     }}
-    it { should contain_package('nomad').with(:ensure => 'latest') }
+    it { should contain_package('nomad').with(:ensure => :latest) }
   end
 
   context 'When requesting to not to install' do
@@ -150,8 +185,9 @@ describe 'nomad' do
 
   context 'The bootstrap_expect in config_hash is an int' do
     let(:params) {{
-      :config_hash =>
-        { 'bootstrap_expect' => '5' }
+      :config_hash => {
+        'server' => { 'bootstrap_expect' => '5' }
+      }
     }}
     it { should contain_file('nomad config.json').with_content(/"bootstrap_expect":5/) }
     it { should_not contain_file('nomad config.json').with_content(/"bootstrap_expect":"5"/) }
@@ -163,7 +199,7 @@ describe 'nomad' do
           'data_dir' => '/dir1',
       },
       :config_hash => {
-          'bootstrap_expect' => '5',
+          'server' => { 'bootstrap_expect' => '5' }
       }
     }}
     it { should contain_file('nomad config.json').with_content(/"bootstrap_expect":5/) }
@@ -174,46 +210,42 @@ describe 'nomad' do
     let(:params) {{
       :config_defaults => {
           'data_dir' => '/dir1',
-          'server' => false,
           'ports' => {
-            'http' => 1,
-            'rpc'  => '8300',
+            'http' => 4646,
+            'rpc'  => '4647',
           },
       },
       :config_hash => {
-          'bootstrap_expect' => '5',
-          'server' => true,
+          'server' => { 'bootstrap_expect' => '5' },
           'ports' => {
             'http'  => -1,
-            'https' => 8500,
+            'serf' => 4648,
           },
       }
     }}
     it { should contain_file('nomad config.json').with_content(/"bootstrap_expect":5/) }
     it { should contain_file('nomad config.json').with_content(/"data_dir":"\/dir1"/) }
-    it { should contain_file('nomad config.json').with_content(/"server":true/) }
     it { should contain_file('nomad config.json').with_content(/"http":-1/) }
-    it { should contain_file('nomad config.json').with_content(/"https":8500/) }
-    it { should contain_file('nomad config.json').with_content(/"rpc":8300/) }
+    it { should contain_file('nomad config.json').with_content(/"rpc":4647/) }
+    it { should contain_file('nomad config.json').with_content(/"serf":4648/) }
   end
 
   context 'When pretty config is true' do
     let(:params) {{
       :pretty_config => true,
       :config_hash => {
-          'bootstrap_expect' => '5',
-          'server' => true,
+          'server' => { 'bootstrap_expect' => '5' },
           'ports' => {
             'http'  => -1,
-            'https' => 8500,
+            'rpc' => 4647,
           },
       }
     }}
-    it { should contain_file('nomad config.json').with_content(/"bootstrap_expect": 5,/) }
-    it { should contain_file('nomad config.json').with_content(/"server": true/) }
-    it { should contain_file('nomad config.json').with_content(/"http": -1,/) }
-    it { should contain_file('nomad config.json').with_content(/"https": 8500/) }
+    it { should contain_file('nomad config.json').with_content(/"server": \{/) }
+    it { should contain_file('nomad config.json').with_content(/"bootstrap_expect": 5/) }
     it { should contain_file('nomad config.json').with_content(/"ports": \{/) }
+    it { should contain_file('nomad config.json').with_content(/"http": -1,/) }
+    it { should contain_file('nomad config.json').with_content(/"rpc": 4647/) }
   end
 
   context "When asked not to manage the user" do
