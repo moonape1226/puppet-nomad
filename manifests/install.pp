@@ -25,11 +25,20 @@ class nomad::install {
       }
 
       include ::archive
-      file { [$install_path, "${install_path}/nomad-${::nomad::version}"]:
-        ensure => directory,
-        owner  => 'root',
-        group  => 0, # 0 instead of root because OS X uses "wheel".
-        mode   => '0555';
+      if ! defined(File[$install_path]) {
+        file { $install_path:
+          ensure => directory,
+          owner  => 'root',
+          group  => 0, # 0 instead of root because OS X uses "wheel".
+          mode   => '0555',
+        }
+      }
+      file { "${install_path}/nomad-${::nomad::version}":
+        ensure  => directory,
+        owner   => 'root',
+        group   => 0, # 0 instead of root because OS X uses "wheel".
+        mode    => '0555',
+        require => File[$install_path],
       }->
       archive { "${install_path}/nomad-${::nomad::version}.${::nomad::download_extension}":
         ensure       => present,
