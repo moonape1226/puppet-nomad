@@ -27,9 +27,9 @@
 /test/version_tmp/
 /tmp/
 /vendor/bundle
-Gemfile.lock
 build/
 log/
 pkg
 spec/fixtures
 vendor/
+.ruby-version
