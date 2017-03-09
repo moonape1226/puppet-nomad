@@ -31,7 +31,7 @@ class nomad::params {
   $service_enable        = true
   $service_ensure        = 'running'
   $user                  = 'nomad'
-  $version               = '0.5.0'
+  $version               = '0.5.4'
 
   case $::architecture {
     'x86_64', 'amd64': { $arch = 'amd64' }

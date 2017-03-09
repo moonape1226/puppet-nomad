@@ -111,9 +111,9 @@ describe 'nomad' do
   end
 
   context "When installing via URL by default" do
-    it { should contain_archive('/opt/puppet-archive/nomad-0.5.0.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.0/nomad_0.5.0_linux_amd64.zip') }
+    it { should contain_archive('/opt/puppet-archive/nomad-0.5.4.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.4/nomad_0.5.4_linux_amd64.zip') }
     it { should contain_file('/opt/puppet-archive').with(:ensure => :directory) }
-    it { should contain_file('/opt/puppet-archive/nomad-0.5.0').with(:ensure => :directory) }
+    it { should contain_file('/opt/puppet-archive/nomad-0.5.4').with(:ensure => :directory) }
     it { should contain_file('/usr/local/bin/nomad').that_notifies('Class[nomad::run_service]') }
   end
 
@@ -121,15 +121,15 @@ describe 'nomad' do
     let(:params) {{
       :archive_path   => '/usr/share/puppet-archive',
     }}
-    it { should contain_archive('/usr/share/puppet-archive/nomad-0.5.0.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.0/nomad_0.5.0_linux_amd64.zip') }
+    it { should contain_archive('/usr/share/puppet-archive/nomad-0.5.4.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.4/nomad_0.5.4_linux_amd64.zip') }
     it { should contain_file('/usr/share/puppet-archive').with(:ensure => :directory) }
-    it { should contain_file('/usr/share/puppet-archive/nomad-0.5.0').with(:ensure => :directory) }
+    it { should contain_file('/usr/share/puppet-archive/nomad-0.5.4').with(:ensure => :directory) }
     it { should contain_file('/usr/local/bin/nomad').that_notifies('Class[nomad::run_service]') }
   end
 
   context "When installing by archive via URL and current version is already installed" do
-    let(:facts) {{ :nomad_version => '0.5.0' }}
-    it { should contain_archive('/opt/puppet-archive/nomad-0.5.0.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.0/nomad_0.5.0_linux_amd64.zip') }
+    let(:facts) {{ :nomad_version => '0.5.4' }}
+    it { should contain_archive('/opt/puppet-archive/nomad-0.5.4.zip').with(:source => 'https://releases.hashicorp.com/nomad/0.5.4/nomad_0.5.4_linux_amd64.zip') }
     it { should contain_file('/usr/local/bin/nomad') }
     it { should_not contain_notify(['Class[nomad::run_service]']) }
   end
@@ -146,7 +146,7 @@ describe 'nomad' do
     let(:params) {{
       :download_url   => '__DOWNLOAD_URL__',
     }}
-    it { should contain_archive('/opt/puppet-archive/nomad-0.5.0.zip').with(:source => '__DOWNLOAD_URL__') }
+    it { should contain_archive('/opt/puppet-archive/nomad-0.5.4.zip').with(:source => '__DOWNLOAD_URL__') }
     it { should contain_file('/usr/local/bin/nomad').that_notifies('Class[nomad::run_service]') }
   end
 
@@ -162,7 +162,7 @@ describe 'nomad' do
       :install_method => 'none'
     }}
     it { should_not contain_package('nomad') }
-    it { should_not contain_archive('/opt/puppet-archive/nomad-0.5.0.zip') }
+    it { should_not contain_archive('/opt/puppet-archive/nomad-0.5.4.zip') }
   end
 
   context "By default, a user and group should be installed" do
