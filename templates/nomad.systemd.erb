@@ -12,6 +12,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 RestartSec=42s
 LimitNOFILE=131072
+TasksMax=infinity
 
 [Install]
 WantedBy=multi-user.target
