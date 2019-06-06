@@ -9,9 +9,14 @@ Group=<%= scope.lookupvar('nomad::group') %>
 ExecStart=<%= scope.lookupvar('nomad::bin_dir') %>/nomad agent \
   -config=<%= scope.lookupvar('nomad::config_dir') %> <%= scope.lookupvar('nomad::extra_options') %>
 ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
 KillSignal=SIGINT
-RestartSec=42s
-LimitNOFILE=131072
+LimitNOFILE=infinity
+LimitNPROC=infinity
+Restart=on-failure
+RestartSec=2
+StartLimitBurst=3
+StartLimitIntervalSec=10
 TasksMax=infinity
 
 [Install]
