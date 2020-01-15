@@ -39,15 +39,15 @@ class nomad::install {
         group   => 0, # 0 instead of root because OS X uses "wheel".
         mode    => '0555',
         require => File[$install_path],
-      }->
-      archive { "${install_path}/nomad-${::nomad::version}.${::nomad::download_extension}":
+      }
+      -> archive { "${install_path}/nomad-${::nomad::version}.${::nomad::download_extension}":
         ensure       => present,
         source       => $::nomad::real_download_url,
         extract      => true,
         extract_path => "${install_path}/nomad-${::nomad::version}",
         creates      => "${install_path}/nomad-${::nomad::version}/nomad",
-      }->
-      file {
+      }
+      -> file {
         "${install_path}/nomad-${::nomad::version}/nomad":
           owner => 'root',
           group => 0, # 0 instead of root because OS X uses "wheel".

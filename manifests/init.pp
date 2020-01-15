@@ -176,13 +176,12 @@ class nomad (
   }
 
   anchor {'nomad_first': }
-  ->
-  class { 'nomad::install': } ->
-  class { 'nomad::config':
+  -> class { 'nomad::install': }
+  -> class { 'nomad::config':
     config_hash => $config_hash_real,
     purge       => $purge_config_dir,
     notify      => $notify_service,
-  } ->
-  class { 'nomad::run_service': } ->
-  anchor {'nomad_last': }
+  }
+  -> class { 'nomad::run_service': }
+  -> anchor {'nomad_last': }
 }

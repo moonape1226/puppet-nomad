@@ -39,8 +39,8 @@ class nomad::config(
           owner   => 'root',
           group   => 'root',
           content => template('nomad/nomad.systemd.erb'),
-        }~>
-        exec { 'nomad-systemd-reload':
+        }
+        ~> exec { 'nomad-systemd-reload':
           command     => 'systemctl daemon-reload',
           path        => [ '/usr/bin', '/bin', '/usr/sbin' ],
           refreshonly => true,
@@ -98,8 +98,8 @@ class nomad::config(
     group   => $::nomad::group,
     purge   => $purge,
     recurse => $purge,
-  } ->
-  file { 'nomad config.json':
+  }
+  -> file { 'nomad config.json':
     path    => "${::nomad::config_dir}/config.json",
     owner   => $::nomad::user,
     group   => $::nomad::group,
