@@ -99,6 +99,13 @@
 #   Specify version of nomad binary to download.
 #
 class nomad (
+  $acls                  = {},
+  $tokens                = {},
+  $policies              = {},
+  $acl_enabled           = $::nomad::params::acl_enabled,
+  $acl_token_ttl         = $::nomad::params::acl_token_ttl,
+  $acl_policy_ttl        = $::nomad::params::acl_policy_ttl,
+  $acl_replication_token = $::nomad::params::acl_replication_token,
   $arch                  = $::nomad::params::arch,
   $archive_path          = $::nomad::params::archive_path,
   $bin_dir               = $::nomad::params::bin_dir,
@@ -184,4 +191,25 @@ class nomad (
   }
   -> class { 'nomad::run_service': }
   -> anchor {'nomad_last': }
+
+  $global_acl_config = {
+    'enabled'           => $acl_enabled,
+    'token_ttl'         => $acl_token_ttl,
+    'policy_ttl'        => $acl_policy_ttl,
+    'replication_token' => $acl_replication_token
+  }
+
+  if $acls {
+    create_resources(nomad_acl, $acls)
+  }
+
+  $policies.each | $name, $policy_config | {
+    $merges_policy_config = merge($global_acl_config, $policy_config)
+    create_resources(nomad_policy, {$name => $merges_policy_config})
+  }
+
+  $tokens.each | $name, $token_config | {
+    $merged_token_config = merge($global_acl_config, $token_config)
+    create_resources(nomad_token, {$name => $merged_token_config})
+  }
 }
